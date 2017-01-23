@@ -1,0 +1,2 @@
+# hnbot
+hacker news bot
