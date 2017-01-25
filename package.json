@@ -1,0 +1,42 @@
+{
+  "name": "hnbot",
+  "version": "1.0.0",
+  "description": "hacker news bot",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./index.js",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/botdio/hnbot.git"
+  },
+  "dependencies": {
+    "co": "^4.6.0",
+    "commander": "^2.9.0",
+    "lodash": "^4.17.4",
+    "moment": "^2.17.1",
+    "redis": "^2.6.5",
+    "shortid": "^2.2.6",
+    "slack_builder": "^1.0.1",
+    "superagent": "^3.3.2",
+    "he": "^1.1.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
+    "should": "^11.1.2"
+  },
+  "keywords": [
+    "hacker",
+    "news",
+    "bot"
+  ],
+  "author": "huan9huan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/botdio/hnbot/issues"
+  },
+  "homepage": "https://github.com/botdio/hnbot#readme"
+}
