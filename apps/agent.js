@@ -22,13 +22,13 @@ class Agent extends EventEmitter{
         this.on('slack', this.onSlack);
         this.on('item', this.onGetItem);
         this.on('changes', this.onGetChanges);
-        this.on('destroy', this.onDestory); // on uninstall the app, need clean me
+        this.on('destroy', this.onDestroy); // on uninstall the app, need clean me
         co(this.loadLiving(this.db.submitted || [])).catch(err => {
             logger.error(`agent: fail to build living list`, err);
         });
         this.sub = new Sub(this);
     }
-    onDestory() {
+    onDestroy() {
         this.sub.remove(this);
     }
 
