@@ -8,6 +8,7 @@ var SlackBuilder = require('slack_builder');
 var HnApi = require('../hn_api');
 var co = require('co');
 var CONST = require('../constants');
+var Sub = require('../sub');
 
 const TYPE = {
     PRINT_FOLLOW: "PRINT_FOLLOW",
@@ -47,6 +48,12 @@ class Follow extends EventEmitter{
         this.on('item', this.onGetItem);
         this.on('changes', this.onGetChanges);
         this.on('timer', this.onTimer);
+        this.on('destroy', this.onDestory);
+        this.sub = new Sub(this);
+    }    
+    onDestory() {
+        this.sub.remove(this);
+        logger.info(`follow: recv destroy event, remove subscribe`);
     }
 
     onTimer(event) {
@@ -117,7 +124,7 @@ class Follow extends EventEmitter{
             var keyword;
             if(keyword = _.find(keywordsList, kw => item.title.toLowerCase().indexOf(kw) >= 0)){
                 this.push(
-                    new SlackBuilder("Keywords ")
+                    new SlackBuilder("keywords ")
                         .a(`"${keyword}"`, this.toHnSearchUrl(keyword))
                         .text(" filter new item:")
                         .i()
@@ -144,7 +151,7 @@ class Follow extends EventEmitter{
         if(renew.descendants !== old.descendants && !this.isMute(SETTING_KEY.COMMENTS)) {
             sb.text(" comments").b(`+${renew.descendants - old.descendants}`);
         }
-        return sb.i().build();
+        return sb.build();
     }
 
     onGetChanges(changes){
@@ -196,7 +203,7 @@ class Follow extends EventEmitter{
                 logger.info(`follow: find changed item ${changedId} and update into db`);
                 var changedDesc = this.diffChange(old, item);
                 if(changedDesc && changedDesc.length > 0){
-                    this.push(new SlackBuilder("Following Item")
+                    this.push(new SlackBuilder("following Item")
                                 .a("" + item.id, `https://news.ycombinator.com/item?id=${item.id}`)
                                 .text(" " + changedDesc)
                                 .i()
@@ -222,14 +229,14 @@ class Follow extends EventEmitter{
                 var empty = true;
                 if(items.length > 0) {
                     this.push(
-                        new SlackBuilder().i("Following Items:").build(),
-                        _.map(items, item => SlackText.toItemAttachment(item))
+                        new SlackBuilder().i("following Items:").build(),
+                        _.map(items, item => SlackText.toItemAttachment(item, {id: true}))
                         );
                     empty = false;
                 }
                 
                 if((this.db.users || []).length > 0) {
-                    var sb = new SlackBuilder().text("Following users");
+                    var sb = new SlackBuilder().text("following users");
                     _.each(this.db.users, u => {
                         sb.a(`@${u.id}`, `https://news.ycombinator.com/user?id=${u.id}`).text(", ");
                     });
@@ -238,7 +245,7 @@ class Follow extends EventEmitter{
                     if(submitted.length > 0){
                         this.push(
                             sb.build(),
-                            _.map(submitted, item => SlackText.toItemAttachment(item))
+                            _.map(submitted, item => SlackText.toItemAttachment(item, {id: true}))
                         ); 
                     }else{
                         this.push(sb.b("None").build());
@@ -246,7 +253,7 @@ class Follow extends EventEmitter{
                     empty = false;           
                 }
                 if((this.db.keywords || []).length > 0) {
-                    var sb = new SlackBuilder().text("Following keywords");
+                    var sb = new SlackBuilder().text("following keywords");
                     _.each(this.db.keywords, kw => {
                         sb.a(`"${kw}"`, this.toHnSearchUrl(kw)).text(", ");
                     })
@@ -254,7 +261,7 @@ class Follow extends EventEmitter{
                     var kwItems = this.db.kwItems || [];
                     if(kwItems.length > 0) {
                         this.push(sb.build(),
-                            _.map(kwItems, item => SlackText.toItemAttachment(item))
+                            _.map(kwItems, item => SlackText.toItemAttachment(item, {id: true}))
                         ); 
                     }else{
                         this.push(sb.b("None").build());
@@ -263,11 +270,9 @@ class Follow extends EventEmitter{
                 }
                 if(empty) {
                     this.push(new SlackBuilder()
-                        .text("Not follow any items, users or keywords,")
+                        .i("not follow any items, users or keywords,")
                         .br()
-                        .code("help follow")
-                        .text(" - to find more")
-                        .i()
+                        .text(new SlackBuilder("help follow").text(" - to find more").i().build())
                         .build());
                 }
                 break;
@@ -358,7 +363,7 @@ class Follow extends EventEmitter{
                     this.push(
                         new SlackBuilder("OK, Start to follow keywords")
                         .a(keywords, this.toHnSearchUrl(keywords)).i()
-                        .br().i("following is latest items")
+                        .br().i("BTW, these are the latest items")
                         .build(),
                         attachments.length > 0 ? attachments : undefined);
                     // save

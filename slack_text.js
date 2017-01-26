@@ -101,26 +101,28 @@ module.exports = {
     toMore: function(item) {
         return `\nFind detail in https://news.ycombinator.com/item?id=${item.id}`
     },
-    toItemSingleDesc: function(item) {
+    toItemSingleDesc: function(item, options) {
         var link = `https://news.ycombinator.com/item?id=${item.id}`
-        var str = new SlackBuilder().text("by")
+        var sb = new SlackBuilder().text("by")
                     .a(item.by, `https://news.ycombinator.com/user?id=${item.by}`)
                     .a(` ${readable(item.time)}`, link)
                     .text(" | ")
                     .a(`${item.score}`, link )
                     .text(" points | ")
                     .a(`${item.descendants}`, link)
-                    .text(" comments ")
-                    .build();
-        return str;
+                    .text(" comments ");
+        if(options && options.id) {
+            sb.text(` | id ${item.id}`);
+        }
+        return sb.build();
     },
-    toItemAttachment: function(item){
+    toItemAttachment: function(item, options){
         var attachment = {
             fallback: item.title,
             color: "#ff6600",
             title: item.title,
             title_link: item.url,
-            text: this.toItemSingleDesc(item),
+            text: this.toItemSingleDesc(item, options),
         }
         return attachment;
     },

@@ -8,6 +8,7 @@ var SlackBuilder = require('slack_builder');
 var HnApi = require('../hn_api');
 var co = require('co');
 var CONST = require('../constants');
+var Sub = require('../sub');
 
 class Agent extends EventEmitter{
     constructor(ctx) {
@@ -21,9 +22,14 @@ class Agent extends EventEmitter{
         this.on('slack', this.onSlack);
         this.on('item', this.onGetItem);
         this.on('changes', this.onGetChanges);
+        this.on('destroy', this.onDestory); // on uninstall the app, need clean me
         co(this.loadLiving(this.db.submitted || [])).catch(err => {
             logger.error(`agent: fail to build living list`, err);
         });
+        this.sub = new Sub(this);
+    }
+    onDestory() {
+        this.sub.remove(this);
     }
 
     match(cid, text) {
@@ -48,6 +54,7 @@ class Agent extends EventEmitter{
         }
     }
     onGetChanges(changes) {
+        logger.info(`agent: notified the changes`, changes);
         var items = changes.items || [];
         var profiles = changes.profiles || [];
         if(!this.db.id) return ;
