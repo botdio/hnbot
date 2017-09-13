@@ -1,7 +1,7 @@
 'use strict';
 
 var CONST = require('./constants');
-var logger = require('botd/logger');
+var logger = require('botd').logger;
 var redis = require("redis");
 var HnApi = require('./hn_api');
 var co = require('co');

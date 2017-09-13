@@ -9,7 +9,6 @@ Shell.addLibs("format", `${__dirname}/libs/format`);
 var SlackBot = require('botd').SlackBot;
 var Connector = require('botd').Connector;
 
-var slack = new SlackBot("xoxb-130197041223-iMd1YBxtz5lhxufes4kSxLOL", "hnbot");
+var slack = new SlackBot("xoxb-116523978963-lRDgKNEFXvh4GHsnjgkXV5DH", "hnbot");
 var connector = new Connector(slack);
-slack.connect(connector);
 slack.startBot();
