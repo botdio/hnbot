@@ -4,15 +4,16 @@
   "description": "hacker news bot",
   "main": "index.js",
   "scripts": {
-    "dev": "node ./index.js",
-    "test": "test"
+    "dev": "nodemon ./index.js",
+    "test": "test",
+    "sync": "nodemon --exec ./sync.sh"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/botdio/hnbot.git"
   },
   "dependencies": {
-    "botd": "git+ssh://git@github.com/botdio/botd.git",
+    "botd": "git+ssh://git@github.com/botdio/botd.git#1.1.0",
     "co": "^4.6.0",
     "commander": "^2.9.0",
     "he": "^1.1.0",
